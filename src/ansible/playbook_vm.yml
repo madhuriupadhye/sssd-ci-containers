@@ -19,9 +19,9 @@
     passkey_support: "{{ override_passkey_support | default('no') | bool }}"
     user_regular_uid: 1024
     ansible_become: yes
-    join_ad: "{{ override_join_ad | default('yes') | bool }}"
+      #join_ad: "{{ override_join_ad | default('yes') | bool }}"
     join_ldap: "{{ override_join_ldap | default('yes') | bool }}"
-    join_samba: "{{ override_join_samba | default('yes') | bool }}"
+      #join_samba: "{{ override_join_samba | default('yes') | bool }}"
     join_ipa: "{{ override_join_ipa | default('yes') | bool }}"
     extended_packageset: "{{ override_extended_packageset | default('no') | bool }}"
 
