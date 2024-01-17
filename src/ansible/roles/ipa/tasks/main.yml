@@ -145,14 +145,16 @@
       ad_domain: "{{ '.'.join(hostvars[groups.ad.0].inventory_hostname.split('.')[1:]) }}"
       safe_password: "{{ service.ad.safe_password }}"
       # TODO: range-type can be configurable ipa-ad-trust or ipa-ad-trust-posix
-      range_type: "--range-type=ipa-ad-trust"
+      range_type: "--range-type=ipa-ad-trust-posix"
+      base_id: "--base-id=100000"
+      range_size: "--range-size=200000"
   - name: Debug AD facts (IPA)
     debug:
       msg: 'AD domain: "{{ ad_domain }}"'
   - name: Run ipa trust-add
     shell: |
       kinit admin
-      ipa trust-add --type=ad {{ ad_domain | quote }} --admin Administrator --password {{ range_type }}
+      ipa trust-add --type=ad {{ ad_domain | quote }} --admin Administrator --password {{ range_type }} {{ base_id }} {{ range_size }}
     args:
       stdin: |
         {{ ipa_password }}
