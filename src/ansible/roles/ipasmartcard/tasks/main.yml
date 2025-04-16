@@ -54,22 +54,22 @@
       content: "{{ ipa_ca_cert.stdout }}"
       dest: /root/ipa.crt
 
-  - name: Add krb5.keytab link for IPA client
-    file:
-      src: /var/enrollment/{{ ipa_domain }}.keytab
-      dest: /etc/krb5.keytab
-      state: link
+#  - name: Add krb5.keytab link for IPA client
+#    file:
+#      src: /var/enrollment/{{ ipa_domain }}.keytab
+#      dest: /etc/krb5.keytab
+#      state: link
 
-  - name: Run IPA advise script on client
-    shell: |
-      kinit admin@{{ ipa_domain.upper() }}
-      sh -x {{ virt_smartcard_dir }}/sc_client.sh {{ sssd_ca_path }} {{ ipa_ca_path }}
-    args:
-      stdin: "{{ ipa_password }}"
-    register: ipa_advise_sc_client
+#  - name: Run IPA advise script on client
+#    shell: |
+#      kinit admin@{{ ipa_domain.upper() }}
+#      sh -x {{ virt_smartcard_dir }}/sc_client.sh {{ sssd_ca_path }} {{ ipa_ca_path }}
+#    args:
+#      stdin: "{{ ipa_password }}"
+#    register: ipa_advise_sc_client
 
-  - name: Remove krb5.keytab link from IPA client
-    file:
-      path: /etc/krb5.keytab
-      state: absent
-  when: inventory_hostname == groups.client.0
+#  - name: Remove krb5.keytab link from IPA client
+#    file:
+#      path: /etc/krb5.keytab
+#      state: absent
+#  when: inventory_hostname == groups.client.0
