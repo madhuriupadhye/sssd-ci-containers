@@ -1,10 +1,29 @@
-- name: Checking DNS resolution first
-  shell: |
-    dig ipa-ca.{{ ipa_domain }} | grep NOERROR
-  register: result
-  until: result.rc == 0
-  retries: 10
-  delay: 2
+#- name: Checking DNS resolution first
+#  shell: |
+#    dig ipa-ca.{{ ipa_domain }} | grep NOERROR
+#  register: result
+#  until: result.rc == 0
+#  retries: 10
+#  delay: 2
+
+#- name: Checking DNS resolution for ipa-ca
+#  shell: dig +short ipa-ca.{{ ipa_domain }}
+#  register: result
+#  until: result.stdout != ""
+#  retries: 10
+#  delay: 5
+
+- name: Debug DNS resolution
+  shell: dig ipa-ca.{{ ipa_domain }} +trace
+  register: debug_dns
+  ignore_errors: true
+
+- debug:
+    var: debug_dns.stdout
+
+- name: Pause for 5 minutes
+  pause:
+    seconds: 300
 
 - name: Make sure virtual smartcard dir exists
   file:
@@ -54,11 +73,27 @@
       content: "{{ ipa_ca_cert.stdout }}"
       dest: /root/ipa.crt
 
+#  - name: Add krb5.keytab link for IPA client
+#    file:
+#      src: /var/enrollment/{{ ipa_domain }}.keytab
+#      dest: /etc/krb5.keytab
+#      state: link
+
+  - name: Check if correct symlink already exists
+    stat:
+      path: /etc/krb5.keytab
+      follow: false
+    register: keytab_link
+
   - name: Add krb5.keytab link for IPA client
-    file:
+    ansible.builtin.file:
       src: /var/enrollment/{{ ipa_domain }}.keytab
       dest: /etc/krb5.keytab
       state: link
+      force: true
+    when: >
+      keytab_link.stat.islnk is not defined or
+      keytab_link.stat.lnk_source != '/var/enrollment/{{ ipa_domain }}.keytab'
 
   - name: Run IPA advise script on client
     shell: |
